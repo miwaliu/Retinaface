@@ -15,7 +15,7 @@ yangfly: RetinaFace-MobileNet0.25.
 
 WiderFace validation mAP: Hard 82.5. (model size: 1.68Mb)
 
-mnet.25
+RetinaFace-MobileNet0.25
 ![mnet.25](detector_test.jpg) 
 
 RetinaFace-R50
