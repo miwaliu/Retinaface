@@ -2,9 +2,11 @@
 RetinaFace windows
 
 Install
+
 Install MXNet with GPU support.
 
 Testing
+
 Please check test.py for testing.
 
 Third-party Models
