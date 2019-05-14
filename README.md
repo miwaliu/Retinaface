@@ -8,6 +8,7 @@ Testing
 Please check test.py for testing.
 
 Third-party Models
+
 yangfly: RetinaFace-MobileNet0.25.
 
 WiderFace validation mAP: Hard 82.5. (model size: 1.68Mb)
