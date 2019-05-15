@@ -12,12 +12,6 @@ from distutils.extension import Extension
 from Cython.Distutils import build_ext
 import numpy as np
 
-# CUDA specific config
-# nvcc is assumed to be in user's PATH
-nvcc_compile_args = ['-O', '--ptxas-options=-v', '-arch=sm_35', '-c', '--compiler-options', '-fPIC', '--shared']
-nvcc_compile_args = os.environ.get('NVCCFLAGS', '').split() + nvcc_compile_args
-cuda_libs = [r'C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v10.0\lib\x64\cublas', r"C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v10.0\lib\x64\cudart"]
-
 
 def find_in_path(name, path):
     "Find a file in a search path"
@@ -126,19 +120,19 @@ ext_modules = [
     Extension(
         "bbox",
         ["bbox.pyx"],
-        extra_compile_args=nvcc_compile_args,
+        extra_compile_args={'gcc': ["-Wno-cpp", "-Wno-unused-function"]},
         include_dirs=[numpy_include]
     ),
     Extension(
         "anchors",
         ["anchors.pyx"],
-        extra_compile_args=nvcc_compile_args,
+        extra_compile_args={'gcc': ["-Wno-cpp", "-Wno-unused-function"]},
         include_dirs=[numpy_include]
     ),
     Extension(
         "cpu_nms",
         ["cpu_nms.pyx"],
-        extra_compile_args=nvcc_compile_args,
+        extra_compile_args={'gcc': ["-Wno-cpp", "-Wno-unused-function"]},
         include_dirs = [numpy_include]
     ),
 ]
@@ -147,15 +141,20 @@ if CUDA is not None:
     ext_modules.append(
         Extension('gpu_nms',
             ['nms_kernel.cu', 'gpu_nms.pyx'],
-            library_dirs=['C:\\Program Files\\NVIDIA GPU Computing Toolkit\\CUDA\\v10.0\\lib\\x64'],
-            libraries=cuda_libs,
+            library_dirs=[CUDA['lib64']],
+            libraries=['cudart'],
             language='c++',
-            #runtime_library_dirs=[CUDA['lib64']],
+            runtime_library_dirs=[CUDA['lib64']],
             # this syntax is specific to this build system
             # we're only going to use certain compiler args with nvcc and not with
             # gcc the implementation of this trick is in customize_compiler() below
-            extra_compile_args=nvcc_compile_args,
-            include_dirs = [numpy_include, 'C:\\Program Files\\NVIDIA GPU Computing Toolkit\\CUDA\\v10.0\\include']
+            extra_compile_args={'gcc': ["-Wno-unused-function"],
+                                'nvcc': ['-arch=sm_35',
+                                         '--ptxas-options=-v',
+                                         '-c',
+                                         '--compiler-options',
+                                         "'-fPIC'"]},
+            include_dirs = [numpy_include, CUDA['include']]
         )
     )
 else:
